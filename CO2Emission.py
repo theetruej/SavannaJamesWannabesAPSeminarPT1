@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib as mpl
 import math
+from scipy import stats
 #Load API Key
 API_dir = './.env.txt'
 
@@ -31,14 +32,33 @@ while i < len(data):
     df = pd.concat([df, pd.DataFrame([[year,us_emissions]],columns=df.columns)],ignore_index= True)
     i += 1
 
+#Linear Regression
+
+
+xMin = 1949
+xMax = 2028
+tickLocation = np.linspace(xMin, xMax, num=20, dtype = int)
+
+extended_years = np.arange(df["Year"].min(),2029)
+
+slope, intercept, r, p, std_err = stats.linregress(df["Year"], df["US CO2 Emissions"])
+def linear_regression(x):
+    return slope * x + intercept
+mymodel = list(map(linear_regression, extended_years))
+
+
+percIncrease2028 = ((linear_regression(2028) - df["US CO2 Emissions"].iloc[-1]) / df["US CO2 Emissions"].iloc[-1]) * 100
+print(f'Predicted increase in 2028: {round(percIncrease2028,1)}%')
+print(f"linear regression prediction of 2028: {round(linear_regression(2028))} Million Metric Tons of CO2")
 #Graphing US CO2 Emissions
 mpl.rcParams["font.size"] = 5
-
 yticks = np.arange(math.floor(df["US CO2 Emissions"].min()), math.ceil(df["US CO2 Emissions"].max()), 500)
-plt.plot(df["Year"], df["US CO2 Emissions"])
+plt.plot(df["Year"], df["US CO2 Emissions"], label="US CO2 Emissions", color="red", marker='o', markersize=3)
+plt.plot(extended_years, mymodel, label="Linear Regression", color="blue", linestyle="--", marker='o', markersize=3, markevery=4)
 plt.xlabel("Year")
-plt.ylabel("US CO2 Emissions (MMTCD)")
+plt.ylabel("CO2 Emissions (MMTCD)")
 plt.title("US CO2 Emissions Over Time")
-plt.xticks(df["Year"][::3])
+plt.xticks(tickLocation)
+plt.xticks(rotation=45)
 plt.legend()
 plt.show()
