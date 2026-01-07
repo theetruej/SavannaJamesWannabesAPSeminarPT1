@@ -26,7 +26,7 @@ data = JSONdata['response']['data']
 df = pd.DataFrame(columns=["Year", "US CO2 Emissions"])
 i = 0
 while i < len(data):
-    
+
     year = float(data[i]['period'])
     us_emissions = float(data[i]['value'])
     df = pd.concat([df, pd.DataFrame([[year,us_emissions]],columns=df.columns)],ignore_index= True)
