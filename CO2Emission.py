@@ -7,6 +7,7 @@ import math
 from scipy import stats
 #Load API Key
 API_dir = './.env.txt'
+print(API_dir)
 
 
 def pullAPIKEY():
@@ -23,6 +24,7 @@ response = requests.get(f"https://api.eia.gov/v2/international/data/?api_key={pu
 JSONdata = response.json()
 
 data = JSONdata['response']['data']
+
 df = pd.DataFrame(columns=["Year", "US CO2 Emissions"])
 i = 0
 while i < len(data):
@@ -44,12 +46,13 @@ extended_years = np.arange(df["Year"].min(),2029)
 slope, intercept, r, p, std_err = stats.linregress(df["Year"], df["US CO2 Emissions"])
 def linear_regression(x):
     return slope * x + intercept
+
 mymodel = list(map(linear_regression, extended_years))
 
 
-percIncrease2028 = ((linear_regression(2028) - df["US CO2 Emissions"].iloc[-1]) / df["US CO2 Emissions"].iloc[-1]) * 100
-print(f'Predicted increase in 2028: {round(percIncrease2028,1)}%')
-print(f"linear regression prediction of 2028: {round(linear_regression(2028))} Million Metric Tons of CO2")
+percIncrease2026 = ((linear_regression(2026) - df["US CO2 Emissions"].iloc[-1]) / df["US CO2 Emissions"].iloc[-1]) * 100
+print(f'Predicted increase in 2026: {round(percIncrease2026,1)}%')
+print(f"linear regression prediction of 2026: {round(linear_regression(2026))} Million Metric Tons of CO2")
 #Graphing US CO2 Emissions
 mpl.rcParams["font.size"] = 5
 yticks = np.arange(math.floor(df["US CO2 Emissions"].min()), math.ceil(df["US CO2 Emissions"].max()), 500)
